@@ -305,7 +305,7 @@ Data 库分表用于存放文章评论、点赞*关系*，data 分表字段如�
 - *time_add*，对应 comment 表 time_add
 - *memo*，备注
 
-![data 库](resource/book1/mysql.data_.jpg)
+![data 库](resource/book1/mysql.data.jpg)
 
 ### 评论
 Data 库表字段 *hash_id* 如：ca10，表示 *uid* 在 *time_add* 对文章10的评论，内容对应亚马逊 DynamoDB 库 comment 表。*memo* 字段默认为空，审核后为即刻时间戳。
