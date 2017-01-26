@@ -24,7 +24,9 @@
 > - …
 > 
 > ![瘦瘦](resource/book1/shoushou.jpg)
+> 
 > ![Boss](resource/book1/boss.jpg)
+> 
 > ![闲鱼](resource/book1/xianyu.jpg)
 > 
 
@@ -42,6 +44,7 @@ Auth 库表只有2个字段 name, uid，其中以 name 为_唯一_ hash 值**分
 2. 点击"获取"得到验证码，后续亦可作为登录密码
 
 ![登录第一步](resource/book1/login.jpg)
+
 ![登录第二步](resource/book1/auth.jpg)
 
 ~~~php
@@ -185,6 +188,7 @@ class Message_Controller extends Ext_Api_Auth_Redis
 
 <a name="dialog"></a>
 ![对话消息](resource/book1/dialog.jpg)
+
 ![评论消息](resource/book1/comment.jpg)
 
 ### 举报
@@ -226,6 +230,7 @@ class Banned_Controller extends Ext_Api_Auth_Redis_Rank
 ~~~
 
 ![举报](resource/book1/report.jpg)
+
 ![举报消息](resource/book1/report_admin.jpg)
 
 ## <a name="explore"></a>内容管理
