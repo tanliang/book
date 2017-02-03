@@ -14,21 +14,21 @@
 ##### 附加
 - 前端 React 加载页面逻辑
 
-##### 说明
-- 示例代码，前端 React-native，后端 PHP
-- 如无特别说明 xxx 库，均为 Mysql 数据库
+##### 示例
+- 前端 [React-native](https://github.com/tanliang/slimmee)
+- 后端 [PHP](https://github.com/tanliang/tl_php)
 
 > - 记录饮食、运动，并获取每日分析，即为“瘦瘦”
 > - 发布职位、简历信息，即为“Boss直聘”；
 > - 发布二手买卖信息，即为“闲鱼”；
 > - …
-> 
+>
 > ![瘦瘦](resource/book1/shoushou.jpg)
-> 
+>
 > ![Boss](resource/book1/boss.jpg)
-> 
+>
 > ![闲鱼](resource/book1/xianyu.jpg)
-> 
+>
 
 # 基础模块
 
