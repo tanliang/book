@@ -18,9 +18,10 @@ tl_php 是一个 MVC 模式的功能代码合集，目录结构如下：
 ![目录](resource/book2/tl_php_dir.jpg)
 
 - 默认二级域名访问，对应 apps 目录下的模块名称，如： admin.tl.dev。IP 访问则一级 URL 值为模块名称，如：127.0.0.1/admin
-- 配置目录 config 放置数据存储相关，分为 local(本地服), test(测试服), online(正式服)，目录下 test 文件默认为空，如有值且于当前访问 $_SERVER['HTTP_HOST'] 相同，则加载测试服配置信息
+- 配置目录 config 放置数据存储相关，分为 *local* (本地服), *test* (测试服), *online* (正式服)，目录下 test 文件默认为空，如有值且于当前访问 $_SERVER['HTTP_HOST'] 相同，则加载 *test* 配置信息
 - lib 目录放置核心功能库 TL，及各种第三方库
 - mod 目录放置具体，及扩展业务逻辑
 - public 作为入口目录，配置 apache 或 nginx 时，均指向此
-- var/cli/important.php 为数据库库分表初始化脚本，var/job/cron_message.php 为自动执行获取客服信息脚本。  
+- var/cli/important.php 为数据库库分表初始化脚本，var/job/cron_message.php 为自动执行获取客服信息脚本。 
+- URL 重写访问，如：http://admin.tl.dev/auth/login， 或 URL 参数访问，如：http://admin.tl.dev/?controller=auth&action=login& 均可。
 
