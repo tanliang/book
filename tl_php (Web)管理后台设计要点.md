@@ -1,6 +1,6 @@
 # tl_php (Web)管理后台设计要点
 
-tl_php 后台是一个从08年开始自研 MVC 框架，功能从最初的简单 CMS 建站工具，不断调整，至此算初步完善，在开发新项目时，能达到事半功倍的效果，希望对大家有所帮助。
+[tl_php](https://github.com/tanliang/tl_php) 后台是一个从08年开始自研 MVC 框架，功能从最初的简单 CMS 建站工具，不断调整，至此算初步完善，在开发新项目时，能达到事半功倍的效果，希望对大家有所帮助。
 
 - [目录结构](#dir)，url重写规则介绍
 - [使用准备](#config)，sql导入，后台访问
@@ -70,5 +70,41 @@ server {
 }
 ~~~
 
+打开浏览器，地址栏输入 http://admin.tl.dev 进入，默认用户名/密码均为 admin
 
+## 权限控制
 
+因为使用了 MVC 模式，把 Controller 定义为一个功能集合体 ，每个 Action 为权限控制单位，默认 *list*(查看)、*add*（新增)、*edit*(编辑) 三个 Action 权限。
+
+~~~php
+abstract class Ext_Admin extends TL_Controller
+{
+    public $actions = array(
+        /**
+         * 当前控制器的动作属性集 由子类覆盖 用以确定 执行动作的权限 格式如下
+         * 有tab表示将出现在tab菜单
+         * auth表示动作权限 真 = 表示该动作需要权限 并验证会员权限列表是否有此ID
+         */
+        'list'      => array('name' => '管理', 'tab' => '管理', 'auth' => true),
+        'add'       => array('name' => '新增', 'tab' => NULL, 'auth' => true),
+        'edit'      => array('name' => '编辑', 'tab' => NULL, 'auth' => true),
+        );
+	...
+}
+~~~
+
+亦可根据需要，对 Action 自行定义。
+
+~~~php
+class Article_Attachment_Controller extends Ext_Admin
+{
+    public $actions = array(
+        'add'      => array('name' => '新增文章附件', 'tab' => NULL, 'auth' => false),
+        'edit'     => array('name' => '编辑文章附件', 'tab' => NULL, 'auth' => false),
+        'del'      => array('name' => '删除文章附件', 'tab' => NULL, 'auth' => false),
+        );
+	...
+}
+~~~
+
+最终效果，如图：
