@@ -72,7 +72,11 @@ server {
 }
 ~~~
 
-打开浏览器，地址栏输入 http://admin.tl.dev 进入，默认用户名/密码均为 admin
+启用 Redis 服务，并配置 config 目录下对应文件 config/json/redis/local 。因为 article 图片上传到 S3，还需配置 config/define.php 的 AWS 相关。
+
+*打开浏览器，使用 phpmyadmin 创建 tl_user, tl_auth, th_data 三个数据库，并修改执行 php -f var/cli/important.php 命令行脚本，初始化分表操作。*
+
+最后，在浏览器地址栏输入 http://admin.tl.dev 进入后台，默认用户名/密码均为 admin
 
 ## 权限控制
 
