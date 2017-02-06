@@ -74,7 +74,7 @@ server {
 
 启用 Redis 服务，并配置 config 目录下对应文件 config/json/redis/local 。因为 article 图片上传到 S3，还需配置 config/define.php 的 AWS 相关。
 
-*打开浏览器，使用 phpmyadmin 创建 tl_user, tl_auth, th_data 三个数据库，并修改执行 php -f var/cli/important.php 命令行脚本，初始化分表操作。*
+*打开浏览器，使用 phpmyadmin 创建 tl_user, tl_auth, tl_data 三个数据库，并修改执行 php -f var/cli/important.php 命令行脚本，初始化分表操作。*
 
 最后，在浏览器地址栏输入 http://admin.tl.dev 进入后台，默认用户名/密码均为 admin
 
@@ -127,7 +127,7 @@ class Article_Attachment_Controller extends Ext_Admin
 
 所有模块均*可增加自定义*功能，如：article 增加 list_column 和 list_botton ，亦可用 form_check 覆盖默认的表单验证。
 
-重点，视图模块化后，只需在 mod 里配好 *getForm/getTable* 参数，除自定义外，无需写额外 view 代码，即可实现 UI。如：
+重点：视图模块化后，只需在 mod 里配好 *getForm/getTable* 参数，除自定义外，无需写额外 view 代码，即可实现 UI。如：
 
 ~~~php
 class Article extends Ext_Model
