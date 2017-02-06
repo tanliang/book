@@ -4,8 +4,8 @@ tl_php 后台是一个从08年开始自研 MVC 框架，功能从最初的简单
 
 - [目录结构](#dir)，url重写规则介绍
 - [使用准备](#config)，sql导入，后台访问
-- 权限控制，新增管理员
-- 视图模块，视图widget
+- [权限控制](#privilege)，mvc 映射
+- [视图模块](#view)，自动生成 UI
 - 缓存加载，pd主动加载，mod被动调用
 - 简单搜索，替代 SQL 的 like 查询
 - 分表分库，hash，自动脚本
@@ -25,7 +25,7 @@ tl_php 是一个 MVC 模式的功能代码合集，目录结构如下：
 - mod 目录放置具体，及扩展业务逻辑
 - public 作为入口目录，配置 apache 或 nginx 时，均指向此
 - var/cli/important.php 为数据库库分表初始化脚本，var/job/cron_message.php 为自动执行获取客服信息脚本。 
-- URL 重写访问，如：http://admin.tl.dev/auth/login， 或 URL 参数访问，如：http://admin.tl.dev/?controller=auth&action=login& 均可。
+- URL 重写访问，如：http://admin.tl.dev/auth/login， 或 URL 参数访问，如：http://admin.tl.dev/?controller=auth&action=login& 或 http://127.0.0.1/?module=admin&controller=auth&action=login& 均可。
 
 
 ## 使用准备<a name="config"></a>
@@ -78,7 +78,7 @@ server {
 
 最后，在浏览器地址栏输入 http://admin.tl.dev 进入后台，默认用户名/密码均为 admin
 
-## 权限控制
+## 权限控制<a name="privilege"></a>
 
 因为使用了 MVC 模式，把 Controller 定义为一个功能集合体 ，每个 Action 为权限控制单位，默认 *list*(查看)、*add*（新增)、*edit*(编辑) 三个 Action 权限。
 
@@ -114,3 +114,72 @@ class Article_Attachment_Controller extends Ext_Admin
 ~~~
 
 最终效果，如图：
+
+![权限](resource/book2/privilege.jpg)
+
+## 视图模块<a name="view"></a>
+
+位于 apps/admin/view/widget 目录下所有 tpl 文件为 *smarty* 视图模块。参考[权限控制](#privilege)，tl_php 后台管理数据 *list*(查看)、*add*（新增)、*edit*(编辑)，把所有功能管理 UI 分成3类：
+
+- 列表，普通数据管理，如：user 用户管理
+- 树形，层级数据管理，如：region 地域管理
+- 表单，新增编辑数据
+
+所有模块均*可增加自定义*功能，如：article 增加 list_column 和 list_botton ，亦可用 form_check 覆盖默认的表单验证。
+
+重点，视图模块化后，只需在 mod 里配好 *getForm/getTable* 参数，除自定义外，无需写额外 view 代码，即可实现 UI。如：
+
+~~~php
+class Article extends Ext_Model
+{
+	...
+
+    public static function getForm($obj)
+    {
+        $ac = new Article_Category();
+        if (empty($obj->day_on)) {
+            $obj->day_on = date('Y-m-d H:i:s');
+        }
+
+        /* 设置表单参数 */
+        $data = array(
+            'type'    => strtolower(get_class()),  
+            'check'   => false,
+            'id'      => $obj->id,
+            'field'   => array(
+                'name'        => array('type' => 'input', 'value' => $obj->name),
+                'author'      => array('type' => 'input', 'value' => $obj->author),
+                'id_article_category' => array('type' => 'select', 'value' => $ac->getTree(), 'required' => $obj->id_article_category, 'label' => 'category'),
+                'article_category'    => array('type' => 'hidden'),
+                'link'        => array('type' => 'input', 'value' => $obj->link),
+                'image'       => array('type' => 'file', 'value' => TL_Tools::base64EncodeUrl($obj->image)),
+                'day_on'      => array('type' => 'time', 'value' => $obj->day_on),
+                'comment_switch'  => array('type' => 'radio', 'value' => $obj->comment_switch),
+                'brief'       => array('type' => 'tinymce', 'value' => $obj->brief),
+                ),
+            );
+
+        return $data;
+    }
+
+    public static function getTable()
+    {
+        /* 设置 table 需要显示的参数 */
+        $data = array(
+            'type'    => 'article', 
+            'nopop'   => true,
+            'field'   => array(
+                'name'      => array('align' => 'left'),
+                //'preview'   => array('width' => '80', 'title' => 'author'),
+                'article_category'  => array('width' => '80'),
+                'day_on'    => array('width' => '125'),
+                'active'    => array('title' => 'status'),
+                ),
+            );
+        return $data;
+    }
+  
+    ...
+}
+~~~
+
