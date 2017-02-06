@@ -76,7 +76,9 @@ server {
 
 *打开浏览器，使用 phpmyadmin 创建 tl_user, tl_auth, tl_data 三个数据库，并修改执行 php -f var/cli/important.php 命令行脚本，初始化分表操作。*
 
-最后，在浏览器地址栏输入 http://admin.tl.dev 进入后台，默认用户名/密码均为 admin
+最后，在浏览器地址栏输入 http://admin.tl.dev 进入后台，默认用户名/密码均为 admin。
+
+*PS: 进入“站点设置” - ‘系统参数“，新增任意键值，生成本地参数。参考[主动缓存](#cache2)*
 
 ## 权限控制<a name="privilege"></a>
 
@@ -127,7 +129,7 @@ class Article_Attachment_Controller extends Ext_Admin
 
 所有模块均*可增加自定义*功能，如：article 增加 list_column 和 list_botton ，亦可用 form_check 覆盖默认的表单验证。
 
-重点：视图模块化后，只需在 mod 里配好 *getForm/getTable* 参数，除自定义外，无需写额外 view 代码，即可实现 UI。如：
+重点：视图模块化后，只需在 mod 里配好 *getForm/getTable* 参数，除自定义外，无需写额外 view 代码，即可实现 UI。
 
 ~~~php
 class Article extends Ext_Model
@@ -182,4 +184,93 @@ class Article extends Ext_Model
     ...
 }
 ~~~
+
+## 缓存加载<a name="cache"></a>
+
+tl_php 使用 Redis 作为缓存容器，替代 mysql 的缓存机制，分2种场景调用，主要区别在于更新机制的不一样。
+
+![缓存](resource/book2/cache.jpg)
+
+### 被动缓存
+
+用于替换 MySQL 的缓存机制，用户请求时更新，内嵌于 mod 扩展功能中，并在数据条目更新时 postEdit 删除缓存，便于下次请求重新生成。
+
+~~~php
+class Ext_Model extends TL_Model
+{
+	...
+    public function getItemByCache($identifier)
+    {
+        if (empty($identifier)) {
+            return false;
+        }
+        // related to postEdit
+        $func = 'getItemByParams';
+        $params = array($this->cls_identifier=>$identifier);
+        return $this->getByCache($func, $params);
+    }
+    
+    protected function getByCache($func, $params=null, $ttl=0)
+    {
+        $key = $this->cls_tbl.':'.md5(serialize($params));
+        $val = $this->cls_cache->get($key);
+        if (!$val) {
+            $val = $this->$func($params);
+            $this->cls_cache->set($key, $val);
+            if ($ttl > 0) {
+                $this->cls_cache->ttl($key, $ttl);
+            }
+        }
+        return $val;
+    }
+
+    public function getItemByParams($params)
+    {
+        $res = $this->_getListByParams($params, null, '1');
+        return isset($res[0])? $res[0]:null;
+    }
+    
+    public function delCache($key)
+    {
+        $key = $this->cls_tbl.':'.md5(serialize($key));
+        $this->cls_cache->del($key);
+    }
+
+    public function postEdit()
+    {
+        if (!empty($this->{$this->cls_identifier})) {
+            $key = $this->{$this->cls_identifier};
+            $this->delCache($key);
+            $this->push2redis(_REDIS_ADMIN_);
+        }
+    }
+}
+~~~
+
+### 主动缓存<a name="cache2"></a>
+
+用于存储一些常用的，共享的，更新不频繁的数据，如：系统参数。数据条目本地更新时，需手动推送至正式 Redis 服务器。
+
+![push2redis](resource/book2/push2redis.jpg)
+
+~~~php
+class Ext_Model extends TL_Model
+{
+	...
+    public function push2redis($type, $suffix='')
+    {
+        if (method_exists($this, 'pdParams')) {
+            $all = $this->getAllByParams($this->pdParams());
+            $redis = TL_Redis::getInstance($type, $suffix);
+            $redis->set('pd:'.$this->cls_name, serialize($all));
+            return true;
+        }
+        return false;
+    }
+}
+~~~
+
+
+
+
 
