@@ -6,8 +6,8 @@ tl_php 后台是一个从08年开始自研 MVC 框架，功能从最初的简单
 - [使用准备](#config)，sql导入，后台访问
 - [权限控制](#privilege)，mvc 映射
 - [视图模块](#view)，自动生成 UI
-- 缓存加载，pd主动加载，mod被动调用
-- 简单搜索，替代 SQL 的 like 查询
+- [缓存加载](#cache)，pd主动加载，mod被动调用
+- [简单搜索](#search)，替代 SQL 的 like 查询
 - 分表分库，hash，自动脚本
 - 关于云服务（S3、DynamoDB）
 
@@ -270,7 +270,49 @@ class Ext_Model extends TL_Model
 }
 ~~~
 
+## 简单搜索<a name="search"></a>
 
+做后台，绕不开的是搜索功能。初级的用 SQL 的 like 查询，数据量大时，效率低。高级的用分词检索，需维护专业词库，如果刚好用户搜素的关键字不在词库中，就尴尬了。
 
+tl_php 简单搜索粗暴点，中文拆分单字，英文拆分单词，统一转成 key，每个 key 对应一个 redis 有序集，如：
 
+![search](resource/book2/search.jpg)
+
+键 search:artice:_u20010 表示中文“和”，对应 value 为文章 ID[8,4,10,3] 四篇文章，示例针对文章标题检索，score 为标题长度排序。
+
+修改执行 php -f var/cli/important.php 命令行脚本，亦可重建索引。获取结果时，默认取 zinterstore 交集，即同时满足所有关键字。
+
+~~~php
+class Misc_Controller extends Ext_Api
+{
+    public function searchAction()
+    {
+        $cate = TL_Tools::safeInput('cate');
+        $value = TL_Tools::safeInput('value');
+        if (!in_array($cate, $this->cates)) {
+            $this->output(102);
+        }
+        if (empty($value)) {
+            $this->output(103);
+        }
+        $search = new Search($cate);
+        $ids = $search->ids($value, 0, 15);
+        $res = array();
+        foreach ($ids['result'] as $v) {
+            $obj = new $cate($v);
+            $res[] = $obj->apiOut();
+        }
+        $method = array(
+            'zinterstore' => '1',
+            'zunionstore' => '0'
+        );
+        $this->result = array(
+            'ok' => $method[$ids['method']],
+            'data' => $res
+        );
+    }
+}
+~~~
+
+最终基本满足一般搜索需求，对于特殊关键字，返回海量结果的，亦可提醒用户更改关键字，缩小检索范围。
 
