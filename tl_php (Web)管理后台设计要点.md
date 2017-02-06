@@ -30,7 +30,7 @@ tl_php 是一个 MVC 模式的功能代码合集，目录结构如下：
 
 ## 使用准备<a name="config"></a>
 
-开发环境可以用 XAMPP，先 phpmyadmin 导入 tl_github.sql.gz，再编辑 httpd-vhosts.conf ，如：
+需 Redis 支持，开发环境可以用 XAMPP，先 phpmyadmin 导入 tl_github.sql.gz，再编辑 httpd-vhosts.conf ，如：
 
 ~~~apache
 <VirtualHost *:80>
