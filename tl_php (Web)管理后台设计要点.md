@@ -8,8 +8,8 @@ tl_php 后台是一个从08年开始自研 MVC 框架，功能从最初的简单
 - [视图模块](#view)，自动生成 UI
 - [缓存加载](#cache)，pd主动加载，mod被动调用
 - [简单搜索](#search)，替代 SQL 的 like 查询
-- 分表分库，hash，自动脚本
-- 关于云服务（S3、DynamoDB）
+- [分表分库](#hash)，hash，自动脚本
+- [关于云服务](#cloud)（S3、DynamoDB）
 
 *ps: 此文档只讲设计思想，具体实现请参考[代码](https://github.com/tanliang/tl_php)。*
 
@@ -30,7 +30,7 @@ tl_php 是一个 MVC 模式的功能代码合集，目录结构如下：
 
 ## 使用准备<a name="config"></a>
 
-需 Redis 支持，开发环境可以用 XAMPP，先 phpmyadmin 导入 tl_github.sql.gz，再编辑 httpd-vhosts.conf ，如：
+需 Redis 支持（默认 7775，7776 端口），开发环境可以用 XAMPP，先 phpmyadmin 导入 tl_github.sql.gz，再编辑 httpd-vhosts.conf ，如：
 
 ~~~apache
 <VirtualHost *:80>
@@ -67,14 +67,13 @@ server {
             rewrite ^/(.*)$ /index.php?$1 last;
         }
     }
-  
 	...
 }
 ~~~
 
 启用 Redis 服务，并配置 config 目录下对应文件 config/json/redis/local 。因为 article 图片上传到 S3，还需配置 config/define.php 的 AWS 相关。
 
-*打开浏览器，使用 phpmyadmin 创建 tl_user, tl_auth, tl_data 三个数据库，并修改执行 php -f var/cli/important.php 命令行脚本，初始化分表操作。*
+*打开浏览器，使用 phpmyadmin 创建 tl_user, tl_auth, tl_data 三个数据库，并修改执行 php -f var/cli/important.php 命令行脚本，[初始化分表操作](#hash)。*
 
 最后，在浏览器地址栏输入 http://admin.tl.dev 进入后台，默认用户名/密码均为 admin。
 
@@ -316,3 +315,17 @@ class Misc_Controller extends Ext_Api
 
 基本满足一般搜索需求，对于特殊关键字，返回大量结果，亦可提醒用户更改关键字，缩小检索范围。
 
+## 分表分库<a name="hash"></a>
+
+tl_php 后台除了主库 tl_github，还使用 tl_auth, tl_user 保存用户认证信息，tl_data 保存评论点赞关系。对应主库 example_auth, example_user, example_data 三个表结构，使用 *php -f var/cli/important.php* 命令脚本初始化。
+
+~~~php
+require '../../config/_initialize.php';
+
+$obj = new Data();
+$obj->tblInit();
+~~~
+
+## 关于云服务<a name="cloud"></a>
+
+使用亚马逊的 S3 存储大量图片，静态化页面，DynamoDB （分区键 uid, 排序键 time_add）存储用户相关数据，能显著*降低运维成本*，加快开发进度。亦可用阿里云的 OSS，及 MongoDB 代替。
