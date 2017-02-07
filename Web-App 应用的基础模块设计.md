@@ -19,12 +19,9 @@
 - 后端 [PHP](https://github.com/tanliang/tl_php)
 
 > ##### 示例
-> - 增加记录饮食、运动，并获取每日分析，即为“瘦瘦”
 > - 用户能发布职位、简历信息，即为“Boss直聘”；
 > - 发布二手买卖信息，即为“闲鱼”；
 > - …
->
-> ![瘦瘦](resource/book1/shoushou.jpg)
 >
 > ![Boss](resource/book1/boss.jpg)
 >
