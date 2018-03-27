@@ -13,7 +13,7 @@
 
 2. Change Log Format
 
-~~LogFormat "%h %l %u %t \"%r\" %>s %b" common~~
+~~LogFormat "%h %l %u %t \\"%r\\" %>s %b" common~~
 ~~~apache
 LogFormat "%a %l %u %t \"%r\" %>s %b" common
 ~~~
