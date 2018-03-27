@@ -31,6 +31,7 @@ KVM acceleration can be used
 ## 设置桥接<a name="bridge_set"></a>
 
 参考:[Ubuntu14.04+KVM配置虚拟机桥接（bridge）](https://blog.csdn.net/fieldoffier/article/details/48497833)
+
 参考:[Ubuntu开发环境搭建](https://www.leolan.top/index.php/posts/193.html)
 
 Bridge方式即虚拟网桥的网络连接方式，是客户机和子网里面的机器能够互相通信。可以使虚拟机成为网络中具有独立IP的主机。
@@ -119,7 +120,7 @@ $ sudo virsh autostart ubuntu_kvm_1
 # 关闭自动启动
 $ sudo virsh autostart --disable ubuntu_kvm_1
 
-# 控制台登录 修改 ip 为静态设置 参考 桥接
+# 控制台登录 修改 ip 为静态
 $ sudo virsh start ubuntu_kvm_1 --console
 # 结束直接关闭窗口
 ~~~
