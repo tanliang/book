@@ -38,6 +38,7 @@ KVM acceleration can be used
 
 Bridge方式即虚拟网桥的网络连接方式，是客户机和子网里面的机器能够互相通信。可以使虚拟机成为网络中具有独立IP的主机。
 桥接网络（也叫物理设备共享）被用作把一个物理设备复制到一台虚拟机。网桥多用作高级设置，特别是主机多个网络接口的情况。
+
 ![bridge方式](resource/ubuntu1604/bridge.png)
 ~~~bash
 vim /etc/network/interfaces
