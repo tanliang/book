@@ -36,6 +36,8 @@ KVM acceleration can be used
 
 参考:[Ubuntu开发环境搭建](https://www.leolan.top/index.php/posts/193.html)
 
+参考:[ubuntu使用桥接模式无法连接网络的问题](https://blog.csdn.net/zhongyoubing/article/details/71081464)
+
 Bridge方式即虚拟网桥的网络连接方式，是客户机和子网里面的机器能够互相通信。可以使虚拟机成为网络中具有独立IP的主机。
 桥接网络（也叫物理设备共享）被用作把一个物理设备复制到一台虚拟机。网桥多用作高级设置，特别是主机多个网络接口的情况。
 
@@ -56,6 +58,8 @@ iface br0 inet static
     netmask 255.255.255.0
     gateway 192.168.199.1
     bridge_ports enp2s0
+
+dns-nameservers 8.8.8.8
 ~~~
 
 ## 安装镜像<a name="install_img"></a>
