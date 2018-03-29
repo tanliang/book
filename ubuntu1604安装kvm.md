@@ -7,6 +7,8 @@
 - [安装镜像](#install_img)
 - [复制镜像](#clone_img)
 - [启动镜像](#start_img)
+- [增加内存](#alert_memory)
+- [增加硬盘](#alert_disk)
 
 ## 安装kvm<a name="install_kvm"></a>
 
@@ -124,3 +126,81 @@ $ sudo virsh autostart --disable ubuntu_kvm_1
 $ sudo virsh start ubuntu_kvm_1 --console
 # 结束直接关闭窗口
 ~~~
+
+### 增加内存<a name="alert_memory"></a>
+
+参考:[CentOS7.1 KVM虚拟化之虚拟机内存、CPU调整(6)](https://blog.csdn.net/hnhuangyiyang/article/details/50902223)
+
+~~~bash
+$ sudo virsh edit ubuntu_kvm_1
+......  
+  <memory unit='KiB'>1048432</memory>  
+  <currentMemory unit='KiB'>1048432</currentMemory>  
+  <vcpu placement='static'>2</vcpu>  
+......  
+~~~
+
+### 增加硬盘<a name="alert_disk"></a>
+
+参考:[给KVM虚拟机增加硬盘](http://blog.fens.me/vps-kvm-disk/)
+
+参考:[linux挂载新硬盘,开机自动挂载](https://my.oschina.net/wukongcelebrity/blog/377363)
+
+~~~bash
+$ sudo qemu-img create -f raw /var/kvm/HD500.img 500G
+...
+
+$ sudo virsh edit ubuntu_kvm_1
+
+#找到硬盘配置(原来的系统硬盘)
+<disk type='file' device='disk'>
+<driver name='qemu' type='raw'/>
+<source file='/disk/sdb1/c1.img'/>
+<target dev='vda' bus='virtio'/>
+<address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+</disk>
+
+#增加文件硬盘,vdb
+<disk type='file' device='disk'>
+<driver name='qemu' type='raw' cache='none'/>
+<source file='/var/kvm/HD500.img'/>
+<target dev='vdb' bus='virtio'/>
+<address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
+</disk>
+
+#保存退出
+
+$ sudo virsh start ubuntu_kvm_1 --console
+
+> 使用 fdisk 对硬盘进行分区
+> $ sudo fdisk /dev/vdb
+>
+>> Command (m for help): n
+>> Select (default p): p
+>>
+>> Command (m for help): w
+>
+> 分区生效
+> $ sudo partprobe
+> $ sudo mkfs -t ext4 /dev/vdb1
+>
+> 自动挂载 获取 UUID
+> $ ls -l /dev/disk/by-uuid
+> $ sudo mkdir /mnt/HD500
+> $ sudo vi /etc/fstab
+>># /etc/fstab: static file system information.
+>>#
+>># Use 'blkid' to print the universally unique identifier for a
+>># device; this may be used with UUID= as a more robust way to name devices
+>># that works even if disks are added and removed. See fstab(5).
+>>#
+>># <file system> <mount point>   <type>  <options>       <dump>  <pass>
+>># / was on /dev/vda1 during installation
+>>UUID=f688b2c6-90a4-4706-9691-799dc521e489 /               ext4    errors=remount-ro 0       1
+>>UUID=1bc194e0-3306-4cb3-86d3-2c0ecd3ac2e7 /mnt/HD500               ext4    errors=remount-ro 0       0
+>># swap was on /dev/vda5 during installation
+>>UUID=3e8161af-b208-4bbd-8480-9c9ed4c734cd none            swap    sw              0       0
+>>
+>>#保存退出
+~~~
+
