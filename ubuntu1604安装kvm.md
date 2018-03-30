@@ -75,8 +75,8 @@ root@dlp:~# mkdir -p /var/kvm/images
 root@dlp:~# virt-install \
 --name template \
 --ram 4096 \
---disk path=/var/kvm/images/template.img,size=30 \
---vcpus 2 \
+--disk path=/var/kvm/images/template.img,size=20 \
+--vcpus 1 \
 --os-type linux \
 --os-variant ubuntu16.04 \
 --network bridge=br0 \
