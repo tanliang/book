@@ -9,6 +9,7 @@
 - [启动镜像](#start_img)
 - [增加内存](#alert_memory)
 - [增加硬盘](#alert_disk)
+- [控制台连接](#start_console)
 
 ## 安装kvm<a name="install_kvm"></a>
 
@@ -66,6 +67,8 @@ dns-nameservers 8.8.8.8
 
 参考:[Create Virtual Machine#1](https://www.server-world.info/en/note?os=Ubuntu_16.04&p=kvm&f=2)
 
+参考:[Ubuntu 16.04设置rc.local开机启动命令/脚本的方法](https://www.linuxidc.com/Linux/2017-09/147166.htm)
+
 字符模式下安装虚拟机，并用终端登录，因为是网络安装，速度有些慢
 ~~~bash
 root@dlp:~# apt-get -y install libosinfo-bin libguestfs-tools virt-top
@@ -105,6 +108,13 @@ Escape character is ^]
 Ubuntu 16.04 LTS ubuntu ttyS0
 
 ubuntu login:
+
+# 修改 rc.local 文件头部 /bin/sh 修改为 /bin/bash
+$ sudo vi /etc/rc.local
+#!/bin/bash -e
+#
+# rc.local
+...
 ~~~
 
 ## 复制镜像<a name="clone_img"></a>
@@ -216,5 +226,24 @@ UUID=1bc194e0-3306-4cb3-86d3-2c0ecd3ac2e7 /mnt/HD500               ext4    error
 UUID=3e8161af-b208-4bbd-8480-9c9ed4c734cd none            swap    sw              0       0
 
 #保存退出
+~~~
+
+### 控制台连接<a name="start_console"></a>
+
+参考:[KVM/Access](https://help.ubuntu.com/community/KVM/Access)
+
+~~~bash
+# 启动镜像时进入
+$ sudo virsh start ubuntu_kvm_1 --console
+
+# 已经启动的镜像
+$ sudo virsh console ubuntu_kvm_1
+...
+连接到域 ubuntu_kvm_php
+换码符为 ^]
+
+# 重点:
+# 此处再按一次回车进入控制台
+# 按 ctrl+] 退出控制台
 ~~~
 
