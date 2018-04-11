@@ -1,4 +1,4 @@
-# linux后台进程监控脚本ß
+# linux后台进程监控脚本
 
 参考:[Bash Shell字符串操作小结](https://my.oschina.net/aiguozhe/blog/41557)
 
