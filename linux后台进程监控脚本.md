@@ -15,10 +15,19 @@ log(){
 _pm(){
   ps=`ps -fe|grep $1 |grep -v grep |wc -l`
   if [ $ps -eq 0 ];then
-    nohup $2 >/dev/null 2>&1 &
-    log "start" "$2"
+    to=/tmp/$1.log
+    if [ ! -n "$3" ] ;then
+      to=/dev/null
+    fi
+    nohup $2 >$to 2>&1 &
+    log "start" "$2 >$to"
   fi
 }
+
+if [ ! -n "$1" ] ;then
+  log "error" "missing process list."
+  exit 1
+fi
 
 cat $1 |while read LINE
 do
@@ -35,14 +44,14 @@ do
   #echo $k
   #echo $s
   if [ $b -ne 0 ] && [ $e -ne 0 ];then
-    _pm "$k" "$s"
+    _pm "$k" "$s" "$2"
   else
     echo "[error] $LINE"
     log "error" "miss [key] string in \"$LINE\""
   fi
 done
 
-#*/3 * * * * /bin/bash /your path/pm.sh /you path/process.txt
+#*/3 * * * * /bin/bash /your path/pm.sh </you path/process.txt> [log]
 ~~~
 
 process.txt 用[key]标示进程关键字
