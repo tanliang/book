@@ -4,6 +4,8 @@
 
 参考:[Shell 函数](http://www.runoob.com/linux/linux-shell-func.html)
 
+参考:[shell判断输入变量或者参数是否为空](http://blog.sina.com.cn/s/blog_a5b3ccfd01016n9z.html)
+
 ~~~bash
 #!/bin/bash
 log(){
