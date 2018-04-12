@@ -46,7 +46,6 @@ do
   if [ $b -ne 0 ] && [ $e -ne 0 ];then
     _pm "$k" "$s" "$2"
   else
-    echo "[error] $LINE"
     log "error" "miss [key] string in \"$LINE\""
   fi
 done
