@@ -28,7 +28,7 @@ warn=$(echo "$load > 0.60*$cpus" |bc)
 if [ $warn = 1 ];then
   echo $time > $file
   subject="load=$load(cpus=$cpus) at `hostname --fqdn`"
-  content="`uptime && ps -eo pid,pcpu,command |sort -k 1 -r -n |head`"
+  content="`uptime && ps -eo pid,pcpu,command |sort -k 2 -r -n |head`"
   echo "$content" |mail -s "$subject" "$1"
 fi
 
