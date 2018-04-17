@@ -26,10 +26,10 @@ load=`uptime |awk -F " " '{ print $NF }'`
 warn=$(echo "$load > 0.60*$cpus" |bc)
 
 if [ $warn = 1 ];then
+  echo $time > $file
   subject="load=$load(cpus=$cpus) at `hostname --fqdn`"
   content="`uptime && ps -eo pid,pcpu,command |sort -k 1 -r -n |head`"
   echo "$content" |mail -s "$subject" "$1"
-  echo $time > $file
 fi
 
 #sudo apt install bc
