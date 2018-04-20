@@ -14,15 +14,42 @@ log(){
   echo "[`date \"+%Y-%m-%d %H:%M:%S\"`] ($type) $info" >> /tmp/pm.log
 }
 
-_pm(){
-  ps=`ps -fe|grep $1 |grep -v grep |wc -l`
+exe(){
+  key=$1
+  cmd=$2
+  log=$3
+
+  ps=`ps -fe|grep $key |grep -v grep |wc -l`
   if [ $ps -eq 0 ];then
-    to=/tmp/$1.log
-    if [ ! -n "$3" ] ;then
+    to=/tmp/$key.log
+    if [ ! -n "$log" ] ;then
       to=/dev/null
     fi
-    nohup $2 >$to 2>&1 &
-    log "start" "$2 >$to"
+    nohup $cmd >$to 2>&1 &
+    log "start" "$cmd >$to"
+  fi
+}
+
+run(){
+  row=$1
+  log=$2
+
+  # get [key] string
+  b=`expr index "$row" "["`
+  e=`expr index "$row" "]"`
+  i=`expr $b + 1`
+  l=`expr $e - $i`
+  k=`expr substr "$row" $i $l`
+
+  # get cmd
+  s=${row/\[/}
+  s=${s/\]/}
+  #echo $k
+  #echo $s
+  if [ $b -ne 0 ] && [ $e -ne 0 ];then
+    exe "$k" "$s" "$log"
+  else
+    log "error" "miss [key] string in \"$row\""
   fi
 }
 
@@ -31,24 +58,10 @@ if [ ! -n "$1" ] ;then
   exit 1
 fi
 
-cat $1 |while read LINE
+cat $1 |while read row
 do
-  # get [key] string
-  b=`expr index "$LINE" "["`
-  e=`expr index "$LINE" "]"`
-  i=`expr $b + 1`
-  l=`expr $e - $i`
-  k=`expr substr "$LINE" $i $l`
-
-  # get cmd
-  s=${LINE/\[/}
-  s=${s/\]/}
-  #echo $k
-  #echo $s
-  if [ $b -ne 0 ] && [ $e -ne 0 ];then
-    _pm "$k" "$s" "$2"
-  else
-    log "error" "miss [key] string in \"$LINE\""
+  if [ -n "$row" ] ;then
+    run "$row" "$2"
   fi
 done
 
