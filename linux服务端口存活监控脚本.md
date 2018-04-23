@@ -85,5 +85,5 @@ done
 
 sm.txt
 ~~~
-test_service=54.169.112.154:80
+test_service=127.0.0.1:80
 ~~~
