@@ -17,6 +17,11 @@ exe(){
   if [ $? -ne 0 ];then
     log=/tmp/$name.sm
     if [ -e $log ] && [ `cat $log |wc -l` -gt 2 ];then
+
+      ############
+      echo "`date "+%Y%m%d%H"`" > /tmp/$name.notify
+      ############
+
       rm $log
       echo "$ip:$port" |mail -s "$name down" "$who"
     else
@@ -36,10 +41,24 @@ run(){
   #echo $ip
   #echo $port
 
-  if [ -n "$ip" ] && [ -n "$port" ];then
-    exe "$name" "$ip" "$port" "$who"
-  else
-    echo "miss ip/port in \"$row\""
+  time=`date "+%Y%m%d%H"`
+  file=/tmp/$name.notify
+  last=0
+  if [ -e $file ];then
+    last=`cat $file`
+  fi
+
+  # notify once per hour
+  if [ $time -ne $last ];then
+
+    #==============
+    if [ -n "$ip" ] && [ -n "$port" ];then
+      exe "$name" "$ip" "$port" "$who"
+    else
+      echo "miss ip/port in \"$row\""
+    fi
+    #==============
+
   fi
 }
 
