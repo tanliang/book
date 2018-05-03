@@ -15,7 +15,7 @@ exe(){
 
   nmap -Pn -p$port $ip | awk "\$1 ~ /$port/ {print \$2}" | grep open >/dev/null 2>&1
   if [ $? -ne 0 ];then
-    log=/tmp/$name.sm
+    log="/tmp/$name`date \"+%Y%m%d%H\"`.sm"
     if [ -e $log ] && [ `cat $log |wc -l` -gt 2 ];then
 
       ############
