@@ -121,6 +121,26 @@ vi ~/ssh_iostat.sh
       fi
     done
 
+＃ 监控java 服务，先手动用 ssh 远程 "touch /tmp/xpm.log"
+vi ~/ssh_xpm.sh
+  #!/bin/bash
+  if [ ! -n "$1" ] ;then
+    echo "missing mailto address."
+    exit 1
+  fi
+
+  tmp=/tmp/xpm.tmp
+
+  /path/ssh_cmd.sh /path/ssh_java.txt "cat /tmp/xpm.log" > $tmp
+
+  d=`cat $tmp |wc -l`
+  #echo $d
+  if [ -n "$d" ] && [ $d -gt 4 ];then
+    /hpath/ssh_cmd.sh /path/ssh_java.txt "echo '' >/tmp/xpm.log"
+    cat $tmp |mutt -s "java service restart" "$1"
+    exit 0
+  fi
+
 #0 8 * * * /bin/bash /path/ssh_df.sh to@example.com
 #15 8 * * * /bin/bash /path/ssh_free.sh to@example.com
 #30 8 * * * /bin/bash /path/ssh_iostat.sh to@example.com
