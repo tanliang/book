@@ -1,13 +1,18 @@
 # 基于 debian 的 docker 配置 java
 
+参考:[Ubuntu 安装 Docker CE 社区版](https://www.getnas.com/2017/07/2620.html)
+
 参考:[Docker学习记录(二)-Dockerfile创建镜像](https://zhuanlan.zhihu.com/p/31244172)
 
+参考:[Docker容器启动后自运行脚本的配置](https://github.com/johnnian/Blog/issues/13)
+
+
+Dockerfile
 ~~~bash
-# Dockerfile
 # Version 0.3
-#显示该镜像是基于 debian:stretch 镜像
+# 显示该镜像是基于 debian:stretch 镜像
 FROM debian:stretch
-#维护人信息
+# 维护人信息
 MAINTAINER tanliang tanjnr@gmail.com
 
 # 设置debian的镜像，加快速度
@@ -58,9 +63,14 @@ ENV PATH $PATH:$JAVA_HOME/bin
 RUN echo "export JAVA_HOME=/usr/local/java/oracle-java" >> /etc/profile
 RUN echo "export PATH=$PATH:$JAVA_HOME" >> /etc/profile
 
-# 开启 crontab 服务
-RUN apt-get install -yqq cron
-RUN service cron start
+# 安装更多服务
+RUN apt-get install -yqq cron redis-server
+RUN echo "#!/bin/sh -e" > /etc/rc.local
+RUN echo "service ssh start" >> /etc/rc.local
+RUN echo "service cron start" >> /etc/rc.local
+RUN echo "service redis-server start" >> /etc/rc.local
+RUN echo "exit 0" >> /etc/rc.local
+RUN chmod 755 /etc/rc.local
 
 # 增加用户
 RUN apt-get install -yqq sudo vim
@@ -69,6 +79,22 @@ RUN echo "ubuntu:ubuntu" |chpasswd
 
 # 开放端口
 EXPOSE 22 8070
-#设置启动命令
-CMD ["/usr/sbin/sshd","-D"]
 ~~~
+
+拷贝本机的 id_ras 用来免密
+~~~bash
+ssh-keygen
+cd /path of Dockerfile
+cat ~/.ssh/id_rsa.pub >authorized_keys
+~~~
+
+根据 Dockerfile 构建镜像
+~~~bash
+sudo docker build --no-cache -t debian_java:0.3 .
+~~~
+
+根据镜像启动容器
+~~~bash
+sudo docker run -itd -p 8071:8070 -p 8022:22 --name niubit1 debian_java:0.3 /bin/bash -c "/etc/rc.local;/bin/bash"
+~~~
+
