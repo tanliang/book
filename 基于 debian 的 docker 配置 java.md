@@ -6,6 +6,8 @@
 
 参考:[Docker容器启动后自运行脚本的配置](https://github.com/johnnian/Blog/issues/13)
 
+参考:[Docker容器和主机如何互相拷贝传输文件](http://xiaorui.cc/2015/04/12/docker容器和主机如何互相拷贝传输文件/)
+
 
 Dockerfile
 ~~~bash
@@ -95,6 +97,6 @@ sudo docker build --no-cache -t debian_java:0.3 .
 
 根据镜像启动容器
 ~~~bash
-sudo docker run -itd -p 8071:8070 -p 8022:22 --name niubit1 debian_java:0.3 /bin/bash -c "/etc/rc.local;/bin/bash"
+sudo docker run -itd -v /home/ubuntu:/mnt -p 8071:8070 -p 8022:22 --name niubit1 debian_java:0.3 /bin/bash -c "/etc/rc.local;/bin/bash"
 ~~~
 
