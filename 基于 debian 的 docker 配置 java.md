@@ -76,7 +76,7 @@ RUN chmod 755 /etc/rc.local
 
 # 增加用户
 RUN apt-get install -yqq sudo vim
-RUN useradd -d /home/ubuntu -m -G sudo ubuntu
+RUN useradd -d /home/ubuntu -m -s /bin/bash -G sudo ubuntu
 RUN echo "ubuntu:ubuntu" |chpasswd
 
 # 开放端口
