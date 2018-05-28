@@ -8,6 +8,8 @@
 
 参考:[Docker容器和主机如何互相拷贝传输文件](http://xiaorui.cc/2015/04/12/docker容器和主机如何互相拷贝传输文件/)
 
+参考:[docker centos6系统crontab及系统日志的一个小坑](http://www.blogmao.com/post/docker%20centos6%20crontab%20not%20run)
+
 
 Dockerfile
 ~~~bash
@@ -66,11 +68,12 @@ RUN echo "export JAVA_HOME=/usr/local/java/oracle-java" >> /etc/profile
 RUN echo "export PATH=$PATH:$JAVA_HOME" >> /etc/profile
 
 # 安装更多服务
-RUN apt-get install -yqq cron redis-server
+RUN apt-get install -yqq cron nginx
 RUN echo "#!/bin/sh -e" > /etc/rc.local
 RUN echo "service ssh start" >> /etc/rc.local
+RUN echo "service nginx start" >> /etc/rc.local
 RUN echo "service cron start" >> /etc/rc.local
-RUN echo "service redis-server start" >> /etc/rc.local
+RUN echo "su - ubuntu /home/ubuntu/run" >> /etc/rc.local
 RUN echo "exit 0" >> /etc/rc.local
 RUN chmod 755 /etc/rc.local
 
@@ -78,6 +81,8 @@ RUN chmod 755 /etc/rc.local
 RUN apt-get install -yqq sudo vim
 RUN useradd -d /home/ubuntu -m -s /bin/bash -G sudo ubuntu
 RUN echo "ubuntu:ubuntu" |chpasswd
+RUN touch /var/spool/cron/crontabs/ubuntu
+RUN chmod 600 /var/spool/cron/crontabs/ubuntu
 
 # 开放端口
 EXPOSE 22 8070
@@ -97,6 +102,22 @@ sudo docker build --no-cache -t debian_java:0.3 .
 
 根据镜像启动容器
 ~~~bash
-sudo docker run -itd -v /home/ubuntu:/mnt -p 8071:8070 -p 8022:22 --name niubit1 debian_java:0.3 /bin/bash -c "/etc/rc.local;/bin/bash"
+sudo docker run -itd --restart=always -v /home/ubuntu:/home/ubuntu \
+    -v /home/ubuntu/nginx/name1:/etc/nginx/sites-enabled/default \
+    -v /home/ubuntu/crontab_name1.sh:/var/spool/cron/crontabs/ubuntu \
+    -v /home/ubuntu/start_name1.sh:/home/ubuntu/run \
+    -p 8071:8070 -p 8022:22 \
+    --name name1 debian_java:0.3 \
+    /bin/bash -c "/etc/rc.local;/bin/bash"
 ~~~
 
+额外的启动脚本 start_name1.sh
+~~~bash
+#!/bin/bash
+echo "test" > /tmp/name1.tmp
+~~~
+
+额外的 cron 脚本 crontab_name1.sh
+~~~bash
+* * * * * echo "`date`" >> /tmp/name1.tmp
+~~~
